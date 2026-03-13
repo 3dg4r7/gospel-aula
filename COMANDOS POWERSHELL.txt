@@ -1,0 +1,88 @@
+COMANDOS POWERSHELL
+
+Stop-Process -Id 8068,9936 -Force
+
+python -m http.server 4173
+
+comando único que libera a porta automaticamente antes de subir o servido
+$port=4173; (netstat -ano | Select-String ":$port\s+.*LISTENING" | ForEach-Object { ($_ -split '\s+')[-1] } | Sort-Object -Unique) | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }; python -m http.server $port
+
+Criando repositorio Github
+
+Crie um repositório no GitHub (de preferência público), vazio (sem README inicial).
+No PowerShell, dentro da pasta do app:
+
+cd e:\local-gospel-aula
+git init
+git branch -M main
+git add .
+git commit -m "chore: publicar app no GitHub Pages"
+git remote add origin https://github.com/SEU_USUARIO/NOME_DO_REPO.git
+git push -u origin main
+
+No GitHub: Settings → Pages.
+Em Build and deployment:
+Source: Deploy from a branch
+Branch: main
+Folder: /(root)
+Clique em Save
+Aguarde 1-5 minutos e abra:
+https://SEU_USUARIO.github.io/NOME_DO_REPO/
+
+Se der 404
+
+Confirme que existe index.html na raiz do repo.
+Confira se Pages está em main /(root).
+Veja a aba Actions do repositório para status do deploy.
+
+Para esse caso (app estático para teste com várias pessoas), público é melhor por reduzir atrito:
+
+Qualquer testador abre o link sem login/permissão no GitHub.
+Menos chance de bloqueio por configuração de acesso.
+Facilita receber feedback/issue de quem está fora do time.
+Seu app já roda no navegador, então o código cliente já fica visível de qualquer forma.
+Se você tiver dados sensíveis, aí vale privado. Mas para protótipo de testes públicos, público é mais prático.
+
+Fluxo contínuo simples (sempre que fizer mudanças):
+
+Testes
+node tests/run-tests.js
+node tests/run-ui-tests.js
+node tests/run-state-tests.js
+
+Commit + push:
+cd e:\local-gospel-aula
+git add .
+git commit -m "feat: descreva a mudanca"
+git push
+
+Aguarde 1-3 minutos e valide no link do Pages:
+https://SEU_USUARIO.github.io/NOME_DO_REPO/
+Checklist rápido antes de push:
+
+index.html continua na raiz
+caminhos de script/css com ./ (como já está)
+testes passando
+
+Padrão de mensagens de commit:
+feat: nova funcionalidade
+fix: correção de bug
+chore: manutenção/infra/organização
+refactor: mudança interna sem alterar comportamento
+test: criação/ajuste de testes
+docs: README/documentação
+style: ajuste visual/CSS sem lógica
+
+Exemplos para seu projeto:
+
+feat: adicionar badge de confianca na analise da cifra
+fix: corrigir parse de capo no formato 2nd fret
+refactor: separar estado do formulario em app-state
+test: cobrir fluxo de analise da cifra na UI
+docs: atualizar README com comandos de teste
+
+Modelo rápido de comando:
+git add .
+git commit -m "tipo: resumo curto no imperativo"
+git push origin main
+

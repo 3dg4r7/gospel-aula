@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gerador de Aula Gospel</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg-shape bg-shape-a" aria-hidden="true"></div>
+    <div class="bg-shape bg-shape-b" aria-hidden="true"></div>
+
+    <main class="container">
+      <header class="hero">
+        <span class="badge">Planejamento Musical</span>
+        <h1>Gerador de Aula de Musica Gospel</h1>
+        <p class="subtitle">
+          Monte aulas de violao, guitarra, teclado, contrabaixo e voz com foco
+          tecnico, devocional e progressivo.
+        </p>
+      </header>
+
+      <div class="grid">
+        <section class="card">
+          <h2>Configuracao da Aula</h2>
+          <form id="lessonForm" autocomplete="off">
+            <div class="field">
+              <label for="profile">Perfil da Aula</label>
+              <select id="profile" required>
+                <option value="Padrao">Carregando perfis...</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="level">Nivel</label>
+              <select id="level" required>
+                <option value="Iniciante">Iniciante</option>
+                <option value="Intermediario">Intermediario</option>
+                <option value="Avancado">Avancado</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="instrument">Instrumento</label>
+              <select id="instrument" required>
+                <option>violao</option>
+                <option>contrabaixo eletrico</option>
+                <option>guitarra</option>
+                <option>teclado</option>
+                <option>voz</option>
+              </select>
+            </div>
+
+            <div class="field full-width">
+              <label for="objective">Objetivo da Aula</label>
+              <input
+                id="objective"
+                required
+                value="Aprender a tocar/cantar 'Quao Grande e o Meu Deus'"
+              />
+            </div>
+
+            <div class="field">
+              <label for="duration">Duracao sugerida</label>
+              <select id="duration" required>
+                <option value="60 minutos">Carregando duracoes...</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="currentBpm">Andamento atual (BPM) - opcional</label>
+              <input
+                id="currentBpm"
+                type="number"
+                min="30"
+                max="260"
+                step="1"
+                placeholder="Ex.: 72"
+              />
+            </div>
+
+            <div class="field full-width">
+              <label for="studentGoal">Objetivo especifico do aluno</label>
+              <textarea
+                id="studentGoal"
+                rows="3"
+                placeholder="Ex.: melhorar transicao entre acordes e tocar no grupo de louvor."
+              ></textarea>
+            </div>
+
+            <div class="actions full-width">
+              <button type="submit" class="btn-primary">Gerar Aula</button>
+              <button type="reset" class="btn-ghost">Limpar</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="card">
+          <h2>Cole a cifra</h2>
+          <p class="subtitle small">
+            Cole a cifra completa para o app adaptar a aula com base em acordes,
+            secoes e complexidade.
+          </p>
+          <textarea
+            id="chordSheetInput"
+            rows="10"
+            placeholder="Exemplo:
+Titulo: Bondade de Deus
+Tom: G
+
+[Verso]
+G D Em C
+..."
+          ></textarea>
+          <div class="analysis-actions">
+            <button id="analyzeChordSheet" type="button" class="btn-ghost">
+              Analisar cifra colada
+            </button>
+          </div>
+          <div id="chordAnalysis" class="analysis-box" hidden>
+            <div class="analysis-head">
+              <h3>Resumo da cifra</h3>
+              <span id="chordConfidenceBadge" class="confidence-badge" hidden></span>
+            </div>
+            <pre id="chordAnalysisOutput"></pre>
+          </div>
+        </section>
+
+        <section class="card card-output">
+          <div class="output-head">
+            <h2>Plano gerado</h2>
+            <div class="output-tools">
+              <span id="tempoIndicator" class="tempo-indicator" hidden>
+                Meta ajustada pelo BPM informado
+              </span>
+              <button id="copyPlan" type="button" class="btn-ghost">Copiar texto</button>
+            </div>
+          </div>
+          <pre id="output">Preencha os campos acima para gerar sua primeira aula.</pre>
+          <p id="statusMessage" class="status" aria-live="polite"></p>
+        </section>
+      </div>
+    </main>
+
+    <script src="./lesson-data.js"></script>
+    <script src="./app-storage.js"></script>
+    <script src="./app-state.js"></script>
+    <script src="./chord-parser.js"></script>
+    <script src="./lesson-generator.js"></script>
+    <script src="./app-ui.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
