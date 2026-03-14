@@ -68,8 +68,24 @@
     const evaluationRubricByLevel = data.evaluationRubricByLevel || {};
     const cyclePhases = data.cyclePhases || [];
     const songSuggestions = data.songSuggestions || [];
+    const instrumentLessonContentByLevel = data.instrumentLessonContentByLevel || {};
+    const instrumentMaterialsByType = data.instrumentMaterialsByType || {};
+    const instrumentPracticeFocusByType = data.instrumentPracticeFocusByType || {};
+    const instrumentExtraExerciseFocusByType = data.instrumentExtraExerciseFocusByType || {};
+    const instrumentSongSuggestionsByLevel = data.instrumentSongSuggestionsByLevel || {};
+    const voiceSongSuggestionsByLevel = data.voiceSongSuggestionsByLevel || {};
     const exercisesByInstrument = data.exercisesByInstrument || {};
     const exerciseVariationPools = data.exerciseVariationPools || {};
+
+    function getInstrumentEntryByName(map, instrumentName) {
+      if (!map || typeof map !== "object") return null;
+      const keys = Object.keys(map);
+      if (keys.length === 0) return null;
+      const normalizedInstrument = normalizeToken(instrumentName);
+      const matchedKey = keys.find((key) => normalizeToken(key) === normalizedInstrument);
+      if (!matchedKey) return null;
+      return map[matchedKey] || null;
+    }
 
     function buildMeasurableGoal(levelName, instrumentName, songName, durationName, lessonNumber, currentBpm) {
       const levelKeys = Object.keys(measurableGoalByLevel);
@@ -208,6 +224,184 @@
       return suggestions;
     }
 
+    function isVoiceInstrument(instrumentName) {
+      return normalizeToken(instrumentName) === "voz";
+    }
+
+    function buildRequiredMaterials(instrumentName) {
+      const configuredMaterials = getInstrumentEntryByName(instrumentMaterialsByType, instrumentName);
+      if (configuredMaterials) return configuredMaterials;
+
+      if (isVoiceInstrument(instrumentName)) {
+        return "Agua, garrafa termica, monitor/fone (opcional), referencia tonal (teclado/app), letra impressa e celular para gravacao.";
+      }
+
+      return "Instrumento afinado, metronomo/app, caderno de cifras, celular para gravacao, agua.";
+    }
+
+    function buildInstrumentSpecificExtraExercises(instrumentName) {
+      const configuredExercises = getInstrumentEntryByName(
+        instrumentExtraExerciseFocusByType,
+        instrumentName
+      );
+      if (Array.isArray(configuredExercises) && configuredExercises.length > 0) {
+        return configuredExercises;
+      }
+
+      if (isVoiceInstrument(instrumentName)) {
+        return [
+          "Respiracao: ciclo 4-4-8 com emissao estavel em vogal sustentada.",
+          "Afinacao: sustentar notas longas com referencia tonal e ajuste fino de vibrato.",
+        ];
+      }
+
+      return [
+        "Ritmo gospel: praticar acentuacao no 2 e 4 com variacoes progressivas.",
+        "Transicao de acordes: ciclo I-V-vi-IV em 3 velocidades (60/75/90 bpm).",
+      ];
+    }
+
+    function buildPracticeWithSongLine({ instrumentName, songName, tonalidade }) {
+      const configuredFocus = getInstrumentEntryByName(instrumentPracticeFocusByType, instrumentName);
+      if (configuredFocus) {
+        if (isVoiceInstrument(instrumentName)) {
+          return `4. Pratica com musica: cantar "${songName}" com foco em ${configuredFocus} (tom sugerido ${tonalidade})`;
+        }
+        return `4. Pratica com musica: aplicar em "${songName}" com foco em ${configuredFocus} (tom sugerido ${tonalidade})`;
+      }
+
+      if (isVoiceInstrument(instrumentName)) {
+        return `4. Pratica com musica: cantar "${songName}" com foco em afinacao, respiracao, diccao e dinamica (tom sugerido ${tonalidade})`;
+      }
+
+      return `4. Pratica com musica: aplicar em "${songName}" com tom sugerido ${tonalidade}`;
+    }
+
+    function getLessonContentByInstrument(levelName, instrumentName, fallbackCfg) {
+      const configuredContentByLevel = getInstrumentEntryByName(instrumentLessonContentByLevel, instrumentName);
+      if (configuredContentByLevel && typeof configuredContentByLevel === "object") {
+        const levelKeys = Object.keys(configuredContentByLevel);
+        if (levelKeys.length > 0) {
+          const resolvedLevel = resolveOption(levelName, levelKeys, levelKeys[0] || "Iniciante");
+          return configuredContentByLevel[resolvedLevel] || fallbackCfg || {};
+        }
+      }
+
+      if (!isVoiceInstrument(instrumentName)) return fallbackCfg || {};
+
+      const voiceByLevel = {
+        Iniciante: {
+          aquecimento: "Respiracao diafragmatica + vocalizes leves em tessitura confortavel.",
+          revisao: "Revisar afinacao de frases curtas e diccao em andamento lento.",
+          novo: "Introducao a apoio respiratorio, ataque suave e finalizacao limpa de frases.",
+          tarefa: "Praticar 15 min/dia: respiracao 4-4-8 + melodia principal com referencia tonal.",
+        },
+        Intermediario: {
+          aquecimento: "Apoio respiratorio + vocalizes com salto de terca e quinta.",
+          revisao: "Revisar estabilidade de afinacao e controle de dinamica por secao.",
+          novo: "Trabalhar harmonizacao vocal simples e intencao interpretativa do texto.",
+          tarefa: "Praticar 20 min/dia com gravacao: verso suave e refrao com projecao controlada.",
+        },
+        Avancado: {
+          aquecimento: "Rotina tecnica completa: respiracao, ressonancia, extensao e controle de timbre.",
+          revisao: "Revisar transicoes de registro, microafinacao e consistencia em passagens longas.",
+          novo: "Aplicar recursos avancados de expressao, blend vocal e lideranca de entrada.",
+          tarefa: "Praticar 30 min/dia com clique e guia: performance completa com dinamica intencional.",
+        },
+      };
+
+      const voiceLevelKeys = Object.keys(voiceByLevel);
+      const resolvedVoiceLevel = resolveOption(levelName, voiceLevelKeys, voiceLevelKeys[0] || "Iniciante");
+      return voiceByLevel[resolvedVoiceLevel] || voiceByLevel.Iniciante;
+    }
+
+    function getVoiceSongSuggestionsByLevel(levelName) {
+      const fallbackVoiceSongsByLevel = {
+        Iniciante: [
+          "Quao Grande e o Meu Deus - Dica vocal iniciante: respiracao e apoio em frases curtas.",
+          "Acredito (Creio) - Dica vocal iniciante: manter afinacao estavel no verso.",
+          "Ousado Amor - Dica vocal iniciante: controlar volume sem forcar a laringe.",
+        ],
+        Intermediario: [
+          "Yeshua - Dica vocal intermediaria: conduzir crescimento de intensidade por secao.",
+          "Ninguem Explica Deus - Dica vocal intermediaria: ajustar ataques e pausas com precisao.",
+          "Bondade de Deus - Dica vocal intermediaria: abrir refrao com projecao e diccao clara.",
+        ],
+        Avancado: [
+          "A Casa e Sua - Dica vocal avancada: liderar dinamica da equipe sem perder afinacao.",
+          "Ninguem Explica Deus - Dica vocal avancada: aplicar variacoes timbricas com controle.",
+          "Yeshua - Dica vocal avancada: trabalhar fraseado longo com respiracao eficiente.",
+        ],
+      };
+
+      const voiceSongsByLevel =
+        Object.keys(voiceSongSuggestionsByLevel).length > 0
+          ? voiceSongSuggestionsByLevel
+          : fallbackVoiceSongsByLevel;
+
+      const levelKeys = Object.keys(voiceSongsByLevel);
+      const resolvedLevel = resolveOption(levelName, levelKeys, levelKeys[0] || "Iniciante");
+      return voiceSongsByLevel[resolvedLevel] || voiceSongsByLevel.Iniciante;
+    }
+
+    function buildSongSuggestionsByInstrument(instrumentName, mergedSongs, levelName) {
+      const normalizedSongs = [...new Set(mergedSongs || [])];
+      if (!isVoiceInstrument(instrumentName)) {
+        const configuredSongsByLevel = getInstrumentEntryByName(
+          instrumentSongSuggestionsByLevel,
+          instrumentName
+        );
+        if (configuredSongsByLevel && typeof configuredSongsByLevel === "object") {
+          const levelKeys = Object.keys(configuredSongsByLevel);
+          if (levelKeys.length > 0) {
+            const resolvedLevel = resolveOption(levelName, levelKeys, levelKeys[0] || "Iniciante");
+            const songs = configuredSongsByLevel[resolvedLevel];
+            if (Array.isArray(songs) && songs.length > 0) return songs;
+          }
+        }
+        return normalizedSongs;
+      }
+
+      const blockedTokens = [
+        "batida",
+        "dedilh",
+        "teclado",
+        "voicing",
+        "voicings",
+        "acorde",
+        "acordes",
+        "groove",
+        "baixo",
+        "triades",
+        "swells",
+        "patch",
+        "timbre",
+      ];
+      const preferredTokens = [
+        "voz",
+        "respir",
+        "frase",
+        "diccao",
+        "congreg",
+        "conduz",
+        "interpret",
+        "dinamica",
+      ];
+
+      const voiceFocused = normalizedSongs.filter((song) => {
+        const normalizedSong = normalizeToken(song);
+        if (blockedTokens.some((token) => normalizedSong.includes(token))) return false;
+        return preferredTokens.some((token) => normalizedSong.includes(token));
+      });
+
+      const levelVoiceSuggestions = getVoiceSongSuggestionsByLevel(levelName);
+      if (voiceFocused.length > 0) {
+        return [...new Set([...voiceFocused, ...levelVoiceSuggestions])];
+      }
+
+      return levelVoiceSuggestions;
+    }
+
     function buildChordAnalysisBlock(analysis) {
       if (!analysis) return "- Nenhuma cifra colada. O plano foi gerado apenas pelo objetivo informado.";
 
@@ -260,7 +454,8 @@
 
       const baseExercises = exercisesByInstrument[instrumentName] || [];
       const variationExercises = getVariationExercises(instrumentName, 1, 3, seed);
-      const chordBasedExercises = buildCifraExerciseSuggestions(analysis);
+      const isVoiceClass = isVoiceInstrument(instrumentName);
+      const chordBasedExercises = isVoiceClass ? [] : buildCifraExerciseSuggestions(analysis);
       const allExercises = [
         ...new Set([
           ...baseExercises,
@@ -270,7 +465,8 @@
         ]),
       ];
 
-      const allSongs = [...new Set([...(songSuggestions || []), ...(profileCfg.songSuggestions || [])])];
+      const mergedSongs = [...new Set([...(songSuggestions || []), ...(profileCfg.songSuggestions || [])])];
+      const allSongs = buildSongSuggestionsByInstrument(instrumentName, mergedSongs, levelName);
       const allTips = [
         ...new Set([
           "Comece simples e consistente; clareza ritmica vale mais que velocidade.",
@@ -302,14 +498,22 @@
       });
 
       const durationBlocks = durationCfg.blocos || [];
-      const weeklyTask = durationCfg.tarefaCasa || cfg.tarefa;
+      const lessonContent = getLessonContentByInstrument(levelName, instrumentName, cfg);
+      const weeklyTask = durationCfg.tarefaCasa || lessonContent.tarefa || cfg.tarefa;
+      const requiredMaterials = buildRequiredMaterials(instrumentName);
+      const practiceWithSongLine = buildPracticeWithSongLine({
+        instrumentName,
+        songName,
+        tonalidade: cfg.tonalidade,
+      });
+      const extraInstrumentExercises = buildInstrumentSpecificExtraExercises(instrumentName);
 
       return `Perfil da Aula: ${profileName}
 Nivel: ${levelName}
 Objetivo da Aula: ${resolvedObjective || "Nao informado"}
 Instrumento: ${instrumentName}
 Duracao Sugerida: ${durationName}
-Materiais Necessarios: Instrumento afinado, metronomo/app, caderno de cifras, celular para gravacao, agua.
+Materiais Necessarios: ${requiredMaterials}
 Materiais Extras do Perfil: ${profileCfg.materiaisExtras || "Nao definido"}
 
 Analise da Cifra Colada:
@@ -328,11 +532,11 @@ Modelo por Duracao:
 ${formatBullets(durationBlocks, "Distribuicao de tempo nao definida.")}
 
 Conteudo da Aula Atual:
-1. Aquecimento: ${cfg.aquecimento}
-2. Revisao: ${cfg.revisao}
-3. Conteudo novo: ${cfg.novo}
-4. Pratica com musica: aplicar em "${songName}" com tom sugerido ${cfg.tonalidade}
-5. Encerramento e tarefa de casa: ${cfg.tarefa}
+1. Aquecimento: ${lessonContent.aquecimento || cfg.aquecimento}
+2. Revisao: ${lessonContent.revisao || cfg.revisao}
+3. Conteudo novo: ${lessonContent.novo || cfg.novo}
+${practiceWithSongLine}
+5. Encerramento e tarefa de casa: ${lessonContent.tarefa || cfg.tarefa}
 
 Planejamento e Progressao:
 - Meta do aluno: ${goal}
@@ -351,8 +555,7 @@ ${formatBullets(allSongs, "Sem sugestoes cadastradas para este perfil.")}
 
 Exercicios (com variacao automatica):
 ${formatBullets(allExercises, "Sem exercicios especificos cadastrados.")}
-- Ritmo gospel: praticar acentuacao no 2 e 4 com variacoes progressivas.
-- Transicao de acordes: ciclo I-V-vi-IV em 3 velocidades (60/75/90 bpm).
+${formatBullets(extraInstrumentExercises, "Sem focos extras definidos.")}
 
 Dicas Praticas:
 ${formatBullets(allTips, "Mantenha consistencia e revisao semanal.")}`;

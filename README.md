@@ -55,6 +55,10 @@ node tests/run-state-tests.js
 - Cópia do plano para área de transferência.
 - Salvamento automático do formulário no `localStorage`.
 - Migração automática de dados antigos sem acentuação.
+- Editor admin no app para editar configuracoes por instrumento e aplicar localmente.
+- Preset rapido por instrumento (violao, contrabaixo, guitarra, teclado e voz) para preencher o editor com base pronta.
+- Validacao de schema no salvar para evitar tipos incorretos no JSON do editor.
+- Pacotes de configuracao versionados no navegador (`v1`, `v2`, `v3`...) para alternar curriculos com um clique.
 
 ## Exemplos de cifra para colar
 
@@ -156,14 +160,26 @@ Tu es, Senhor
 3. Preencha: `objetivoTempo`, `blocos`, `tarefaCasa`.
 4. Recarregue a página.
 
-## Como ajustar metas, rubrica e ciclo pedagógico
+## Como ajustar metas, rubrica e ciclo pedagogico
 
-- Metas mensuráveis por nível: `measurableGoalByLevel`.
-- Calibração de meta por instrumento: `measurableGoalByInstrument`.
-- Rubrica por nível: `evaluationRubricByLevel`.
+- Metas mensuraveis por nivel: `measurableGoalByLevel`.
+- Calibracao de meta por instrumento: `measurableGoalByInstrument`.
+- Rubrica por nivel: `evaluationRubricByLevel`.
 - Fases do ciclo de 4 aulas: `cyclePhases`.
-- Variações automáticas por instrumento: `exerciseVariationPools`.
+- Variacoes automaticas por instrumento: `exerciseVariationPools`.
+- Repertorio vocal por nivel: `voiceSongSuggestionsByLevel`.
+- Conteudo por instrumento e nivel: `instrumentLessonContentByLevel`.
+- Materiais por instrumento: `instrumentMaterialsByType`.
+- Foco de pratica por instrumento: `instrumentPracticeFocusByType`.
+- Focos extras de exercicio por instrumento: `instrumentExtraExerciseFocusByType`.
+- Repertorio por instrumento e nivel: `instrumentSongSuggestionsByLevel`.
 
+## Fluxo recomendado do editor admin
 
-
+1. Escolha o instrumento em `Preset rapido por instrumento`.
+2. Clique em `Inserir preset no editor`.
+3. Ajuste o JSON conforme sua metodologia.
+4. Clique em `Salvar e aplicar` para testar no plano gerado.
+5. Informe um nome de pacote e clique em `Salvar nova versao` para guardar historico.
+6. Use `Aplicar pacote` para trocar rapido de curriculo (ex.: `Voz culto noite v2`).
 

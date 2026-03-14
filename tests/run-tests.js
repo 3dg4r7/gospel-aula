@@ -1,4 +1,4 @@
-const assert = require("node:assert/strict");
+﻿const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
@@ -187,6 +187,113 @@ test("gerador de aula usa analise da cifra no plano final", () => {
   assert.ok(plan.includes("Ciclo Sugerido (4 Aulas):"));
 });
 
+test("gerador separa conteudo de voz sem blocos instrumentais", () => {
+  const generator = generatorFactory.createLessonGenerator(plannerData, parser);
+  const plan = generator.buildLessonPlan({
+    profile: "Padrao",
+    level: "Intermediario",
+    objective: "",
+    instrument: "voz",
+    duration: "60 minutos",
+    currentBpm: "72",
+    studentGoal: "",
+    chordSheet: ultimateGuitarExample,
+  });
+
+  assert.ok(plan.includes("Instrumento: voz"));
+  assert.ok(plan.includes("Materiais Necessarios: Agua, garrafa termica"));
+  assert.ok(plan.includes('4. Pratica com musica: cantar "Oceans"'));
+  assert.ok(plan.includes("Respiracao: ciclo 4-4-8"));
+  assert.ok(plan.includes("Conteudo novo: Trabalhar harmonizacao vocal simples"));
+  assert.ok(!plan.includes("Transicao de acordes"));
+  assert.ok(!plan.includes("Treino de ciclo da cifra"));
+  assert.ok(!plan.includes("Campo harmonico aplicado ao louvor"));
+  assert.ok(plan.includes("Musicas Sugeridas:"));
+  assert.ok(!plan.includes("batida pop worship"));
+  assert.ok(!plan.includes("dedilhado"));
+  const songsBlock = plan.split("Musicas Sugeridas:")[1] || "";
+  assert.ok(/voz|respir|conduz|frase/i.test(songsBlock));
+});
+test("repertorio vocal muda conforme nivel da aula", () => {
+  const generator = generatorFactory.createLessonGenerator(plannerData, parser);
+
+  const beginnerPlan = generator.buildLessonPlan({
+    profile: "Padrao",
+    level: "Iniciante",
+    objective: "",
+    instrument: "voz",
+    duration: "60 minutos",
+    currentBpm: "",
+    studentGoal: "",
+    chordSheet: "",
+  });
+
+  const advancedPlan = generator.buildLessonPlan({
+    profile: "Padrao",
+    level: "Avancado",
+    objective: "",
+    instrument: "voz",
+    duration: "60 minutos",
+    currentBpm: "",
+    studentGoal: "",
+    chordSheet: "",
+  });
+
+  const beginnerSongs = beginnerPlan.split("Musicas Sugeridas:")[1] || "";
+  const advancedSongs = advancedPlan.split("Musicas Sugeridas:")[1] || "";
+
+  assert.ok(beginnerSongs.includes("Dica vocal iniciante"));
+  assert.ok(advancedSongs.includes("Dica vocal avancada"));
+  assert.ok(!beginnerSongs.includes("Dica vocal avancada"));
+  assert.ok(!advancedSongs.includes("Dica vocal iniciante"));
+});
+test("gerador usa voiceSongSuggestionsByLevel vindo do plannerData", () => {
+  const customPlannerData = {
+    ...plannerData,
+    voiceSongSuggestionsByLevel: {
+      Iniciante: ["Musica Teste Inicial - Dica vocal iniciante custom."],
+      Intermediario: ["Musica Teste Inter - Dica vocal intermediaria custom."],
+      Avancado: ["Musica Teste Avancado - Dica vocal avancada custom."],
+    },
+  };
+
+  const generator = generatorFactory.createLessonGenerator(customPlannerData, parser);
+  const plan = generator.buildLessonPlan({
+    profile: "Padrao",
+    level: "Avancado",
+    objective: "",
+    instrument: "voz",
+    duration: "60 minutos",
+    currentBpm: "",
+    studentGoal: "",
+    chordSheet: "",
+  });
+
+  const songsBlock = plan.split("Musicas Sugeridas:")[1] || "";
+  assert.ok(songsBlock.includes("Musica Teste Avancado"));
+  assert.ok(!songsBlock.includes("Yeshua - Dica vocal avancada"));
+});
+test("gerador separa conteudo de guitarra sem mistura de trilha vocal", () => {
+  const generator = generatorFactory.createLessonGenerator(plannerData, parser);
+  const plan = generator.buildLessonPlan({
+    profile: "Padrao",
+    level: "Intermediario",
+    objective: "",
+    instrument: "guitarra",
+    duration: "60 minutos",
+    currentBpm: "",
+    studentGoal: "",
+    chordSheet: "",
+  });
+
+  assert.ok(plan.includes("Instrumento: guitarra"));
+  assert.ok(plan.includes("Materiais Necessarios: Guitarra regulada"));
+  assert.ok(plan.includes("Conteudo novo: Aplicar fraseado de apoio com delays curtos"));
+  assert.ok(!plan.includes("Trabalhar harmonizacao vocal simples"));
+  const songsBlock = plan.split("Musicas Sugeridas:")[1] || "";
+  assert.ok(songsBlock.includes("Dica guitarra intermediaria"));
+  assert.ok(!songsBlock.includes("Dica vocal"));
+});
 test("parseCurrentBpm valida limites", () => {
   const generator = generatorFactory.createLessonGenerator(plannerData, parser);
   assert.equal(generator.parseCurrentBpm("29"), null);
@@ -210,3 +317,10 @@ if (failures.length > 0) {
 }
 
 console.log(`\n${results.length} testes passaram.`);
+
+
+
+
+
+
+

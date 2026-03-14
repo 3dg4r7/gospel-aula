@@ -115,19 +115,48 @@ function createRuntime() {
     "currentBpm",
     "studentGoal",
     "chordSheetInput",
+    "configEditor",
+    "configSave",
+    "configReset",
+    "configReload",
+    "configPresetInstrument",
+    "configApplyPreset",
+    "configPackageName",
+    "configPackageSave",
+    "configPackageList",
+    "configPackageApply",
+    "configPackageDelete",
   ];
 
   elementIds.forEach((id) => {
     const tagName =
       id === "lessonForm"
         ? "form"
-        : ["profile", "level", "instrument", "duration"].includes(id)
+        : [
+              "profile",
+              "level",
+              "instrument",
+              "duration",
+              "configPresetInstrument",
+              "configPackageList",
+            ].includes(id)
           ? "select"
-          : id.includes("Btn") || id === "copyPlan" || id === "analyzeChordSheet"
+          : id.includes("Btn") ||
+              id === "copyPlan" ||
+              id === "analyzeChordSheet" ||
+              id === "configSave" ||
+              id === "configReset" ||
+              id === "configReload" ||
+              id === "configApplyPreset" ||
+              id === "configPackageSave" ||
+              id === "configPackageApply" ||
+              id === "configPackageDelete"
             ? "button"
-            : ["studentGoal", "chordSheetInput"].includes(id)
+            : ["studentGoal", "chordSheetInput", "configEditor"].includes(id)
               ? "textarea"
-              : "div";
+              : ["objective", "currentBpm", "configPackageName"].includes(id)
+                ? "input"
+                : "div";
     document.register(new MockElement(tagName, id));
   });
 
@@ -246,6 +275,102 @@ test("analisar com campo vazio mostra erro e esconde resumo", () => {
   assert.equal(summaryText.textContent, "");
   assert.equal(badge.hidden, true);
   assert.ok(status.textContent.includes("Cole uma cifra valida para analisar."));
+});
+
+test("editor de configuracoes valida JSON, schema e aplica override local", () => {
+  const editor = document.getElementById("configEditor");
+  const saveBtn = document.getElementById("configSave");
+  const status = document.getElementById("statusMessage");
+  const output = document.getElementById("output");
+  const objective = document.getElementById("objective");
+  const instrument = document.getElementById("instrument");
+  const level = document.getElementById("level");
+
+  editor.value = "{ invalido }";
+  saveBtn.dispatchEvent("click");
+  assert.ok(status.textContent.includes("JSON invalido"));
+
+  editor.value = JSON.stringify({
+    instrumentMaterialsByType: {
+      voz: 10,
+    },
+  });
+  saveBtn.dispatchEvent("click");
+  assert.ok(status.textContent.includes("Schema invalido"));
+
+  objective.value = "Teste repertorio";
+  instrument.value = "voz";
+  level.value = "Avancado";
+
+  editor.value = JSON.stringify({
+    voiceSongSuggestionsByLevel: {
+      Avancado: ["Musica UI Teste - Dica vocal avancada custom."],
+    },
+  });
+  saveBtn.dispatchEvent("click");
+
+  assert.ok(status.textContent.includes("Configuracoes salvas"));
+  assert.ok(output.textContent.includes("Musica UI Teste"));
+});
+
+test("preset por instrumento insere bloco no editor", () => {
+  const presetSelect = document.getElementById("configPresetInstrument");
+  const presetBtn = document.getElementById("configApplyPreset");
+  const editor = document.getElementById("configEditor");
+  const status = document.getElementById("statusMessage");
+
+  presetSelect.value = "guitarra";
+  editor.value = "{}";
+  presetBtn.dispatchEvent("click");
+
+  const parsed = JSON.parse(editor.value);
+  assert.ok(status.textContent.includes("Preset"));
+  assert.ok(parsed.instrumentLessonContentByLevel);
+  assert.ok(parsed.instrumentLessonContentByLevel.guitarra);
+  assert.ok(parsed.instrumentMaterialsByType);
+  assert.ok(parsed.instrumentMaterialsByType.guitarra);
+});
+
+test("pacotes versionados salvam versoes e aplicam configuracao", () => {
+  const editor = document.getElementById("configEditor");
+  const packageName = document.getElementById("configPackageName");
+  const packageSave = document.getElementById("configPackageSave");
+  const packageApply = document.getElementById("configPackageApply");
+  const packageList = document.getElementById("configPackageList");
+  const status = document.getElementById("statusMessage");
+  const objective = document.getElementById("objective");
+  const instrument = document.getElementById("instrument");
+  const level = document.getElementById("level");
+  const output = document.getElementById("output");
+
+  packageName.value = "Pacote Voz";
+
+  editor.value = JSON.stringify({
+    voiceSongSuggestionsByLevel: {
+      Avancado: ["Pacote Voz v1"],
+    },
+  });
+  packageSave.dispatchEvent("click");
+  assert.ok(status.textContent.includes("v1"));
+
+  editor.value = JSON.stringify({
+    voiceSongSuggestionsByLevel: {
+      Avancado: ["Pacote Voz v2"],
+    },
+  });
+  packageSave.dispatchEvent("click");
+  assert.ok(status.textContent.includes("v2"));
+
+  const labels = packageList.children.map((item) => item.textContent);
+  assert.ok(labels.some((label) => label.includes("(v2)")));
+
+  objective.value = "Aplicar pacote";
+  instrument.value = "voz";
+  level.value = "Avancado";
+  packageApply.dispatchEvent("click");
+
+  assert.ok(status.textContent.includes("aplicado"));
+  assert.ok(output.textContent.includes("Pacote Voz v2"));
 });
 
 const failures = results.filter((item) => item.status === "fail");

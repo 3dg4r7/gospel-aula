@@ -443,3 +443,61 @@ pre {
   border: 1px solid rgba(98, 153, 176, 0.22);
   background: rgba(8, 21, 30, 0.9);
 }
+
+.config-card {
+  margin-top: 16px;
+  animation-delay: 180ms;
+}
+
+.config-card textarea {
+  margin-top: 10px;
+  min-height: 240px;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.config-presets {
+  margin-top: 10px;
+}
+
+.config-packages {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(98, 153, 176, 0.2);
+}
+
+.config-packages h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.config-row {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.config-row + .config-row {
+  grid-template-columns: 1.3fr repeat(2, minmax(0, 1fr));
+}
+
+.config-actions {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .config-row,
+  .config-row + .config-row {
+    grid-template-columns: 1fr;
+  }
+
+  .config-actions {
+    grid-template-columns: 1fr;
+  }
+}

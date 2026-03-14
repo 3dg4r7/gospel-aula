@@ -326,6 +326,223 @@ window.lessonPlannerData = Object.freeze({
     "Ninguém Explica Deus - Cifra base: D A Bm G | Dica: trabalhar ataques e pausas da voz.",
     "A Casa é Sua - Cifra base: C G D Em | Dica: variar dedilhado e condução no teclado.",
   ],
+  voiceSongSuggestionsByLevel: {
+    Iniciante: [
+      "Quao Grande e o Meu Deus - Dica vocal iniciante: respiracao e apoio em frases curtas.",
+      "Acredito (Creio) - Dica vocal iniciante: manter afinacao estavel no verso.",
+      "Ousado Amor - Dica vocal iniciante: controlar volume sem forcar a laringe.",
+    ],
+    Intermediario: [
+      "Yeshua - Dica vocal intermediaria: conduzir crescimento de intensidade por secao.",
+      "Ninguem Explica Deus - Dica vocal intermediaria: ajustar ataques e pausas com precisao.",
+      "Bondade de Deus - Dica vocal intermediaria: abrir refrao com projecao e diccao clara.",
+    ],
+    Avancado: [
+      "A Casa e Sua - Dica vocal avancada: liderar dinamica da equipe sem perder afinacao.",
+      "Ninguem Explica Deus - Dica vocal avancada: aplicar variacoes timbricas com controle.",
+      "Yeshua - Dica vocal avancada: trabalhar fraseado longo com respiracao eficiente.",
+    ],
+  },
+  instrumentMaterialsByType: {
+    violao:
+      "Violao afinado, capo (opcional), palhetas, metronomo/app, caderno de cifras e celular para gravacao.",
+    "contrabaixo eletrico":
+      "Contrabaixo afinado, cabo, amplificador/DI, metronomo/app, caderno de cifras e celular para gravacao.",
+    guitarra:
+      "Guitarra regulada, cabo, fonte/pedais essenciais, metronomo/app, mapa de secoes e celular para gravacao.",
+    teclado:
+      "Teclado com fonte/pedal sustain, monitor/fone, metronomo/app, mapa harmonico e celular para gravacao.",
+    voz: "Agua, garrafa termica, monitor/fone (opcional), referencia tonal (teclado/app), letra impressa e celular para gravacao.",
+  },
+  instrumentPracticeFocusByType: {
+    violao: "trocas limpas de acordes, regularidade de batida e dinamica por secao",
+    "contrabaixo eletrico": "tempo firme no 1, consistencia de groove e articulacao entre secoes",
+    guitarra: "fraseado de apoio, controle de ruido e dinamica de ambiencia",
+    teclado: "conducao de vozes, equilibrio entre maos e densidade harmonica",
+    voz: "afinacao, respiracao, diccao e dinamica",
+  },
+  instrumentExtraExerciseFocusByType: {
+    violao: [
+      "Ritmo: praticar acentuacao no 2 e 4 com variacoes progressivas.",
+      "Transicao de acordes: ciclo I-V-vi-IV em 3 velocidades (60/75/90 bpm).",
+    ],
+    "contrabaixo eletrico": [
+      "Groove: tônica e quinta em colcheias com consistencia de ataque por 4 minutos.",
+      "Conducao: ligar secoes com notas de passagem sem perder pulso no tempo 1.",
+    ],
+    guitarra: [
+      "Fraseado: montar resposta curta entre frases vocais sem sobrecarregar o arranjo.",
+      "Timbre: alternar drive limpo e ambiencia mantendo volume equilibrado no mix.",
+    ],
+    teclado: [
+      "Voicings: praticar inversoes com minimo deslocamento entre verso e refrao.",
+      "Textura: alternar pad e piano conforme densidade da banda sem cobrir a voz.",
+    ],
+    voz: [
+      "Respiracao: ciclo 4-4-8 com emissao estavel em vogal sustentada.",
+      "Afinacao: sustentar notas longas com referencia tonal e ajuste fino de vibrato.",
+    ],
+  },
+  instrumentLessonContentByLevel: {
+    violao: {
+      Iniciante: {
+        aquecimento: "Coordenacao de mao direita com batida simples e pulso estavel.",
+        revisao: "Revisar acordes abertos e trocas sem interromper o compasso.",
+        novo: "Aplicar batida base worship com abafamento controlado.",
+        tarefa: "Praticar 15 min/dia alternando batida base e dedilhado simples.",
+      },
+      Intermediario: {
+        aquecimento: "Independencia de dedos com arpejos e acentos ritmicos.",
+        revisao: "Revisar pestanas, limpeza de cordas e dinamica entre secoes.",
+        novo: "Aplicar variacoes de batida e conducoes entre verso/refrao.",
+        tarefa: "Praticar 20 min/dia com clique e gravacao de duas secoes da musica.",
+      },
+      Avancado: {
+        aquecimento: "Técnica de precisão com groove, muting e resposta ritmica rapida.",
+        revisao: "Revisar conducoes harmonicas com voicings e tensoes controladas.",
+        novo: "Criar arranjo de violao com textura, dinâmica e suporte de banda.",
+        tarefa: "Praticar 30 min/dia com dois takes completos e autoavaliacao de tempo.",
+      },
+    },
+    "contrabaixo eletrico": {
+      Iniciante: {
+        aquecimento: "Pulso em semínimas com alternancia de dedos e som consistente.",
+        revisao: "Revisar tônica e quinta nos acordes principais da musica.",
+        novo: "Aplicar groove simples com entradas limpas no inicio de cada secao.",
+        tarefa: "Praticar 15 min/dia com metrônomo focando estabilidade no tempo 1.",
+      },
+      Intermediario: {
+        aquecimento: "Groove em colcheias com controle de ataque e dinâmica.",
+        revisao: "Revisar conducoes entre secoes com notas de passagem diatonicas.",
+        novo: "Aplicar variações de groove mantendo apoio firme à banda.",
+        tarefa: "Praticar 20 min/dia gravando verso/refrao com controle de dinâmica.",
+      },
+      Avancado: {
+        aquecimento: "Precisão de microtempo com ghost notes e articulacao refinada.",
+        revisao: "Revisar escolhas de registro e consistencia de groove em musica completa.",
+        novo: "Construir linha de baixo que sustenta harmonia e responde à dinâmica da voz.",
+        tarefa: "Praticar 30 min/dia com clique e sem clique comparando estabilidade.",
+      },
+    },
+    guitarra: {
+      Iniciante: {
+        aquecimento: "Articulacao de mao esquerda + palhetada alternada em andamento lento.",
+        revisao: "Revisar acordes base e riffs de ligacao curtos entre frases.",
+        novo: "Aplicar fraseado de apoio simples sem competir com a melodia.",
+        tarefa: "Praticar 15 min/dia alternando base limpa e pequenas frases de apoio.",
+      },
+      Intermediario: {
+        aquecimento: "Fraseado com acentuacao ritmica e controle de ruído.",
+        revisao: "Revisar arpejos e transicoes entre timbres limpo/ambiente.",
+        novo: "Aplicar fraseado de apoio com delays curtos e respostas por secao.",
+        tarefa: "Praticar 20 min/dia com duas variacoes de frase por secao da musica.",
+      },
+      Avancado: {
+        aquecimento: "Tecnica avancada de articulacao com precisao ritmica e dinamica.",
+        revisao: "Revisar escolha de timbre e espaço no arranjo em tempo real.",
+        novo: "Construir camadas de guitarra com intencao musical e liderança de dinâmica.",
+        tarefa: "Praticar 30 min/dia gravando versao completa com duas abordagens de arranjo.",
+      },
+    },
+    teclado: {
+      Iniciante: {
+        aquecimento: "Coordenacao entre maos com triades simples e pulso constante.",
+        revisao: "Revisar inversoes basicas e mudancas suaves entre acordes.",
+        novo: "Aplicar base de piano com voicings simples para apoiar a voz.",
+        tarefa: "Praticar 15 min/dia com transicoes de acordes em duas tonalidades.",
+      },
+      Intermediario: {
+        aquecimento: "Independencia de maos com padrao ritmico e voicings intermediarios.",
+        revisao: "Revisar condução de vozes sem saltos bruscos entre secoes.",
+        novo: "Aplicar camadas de piano/pad mantendo clareza harmonica no arranjo.",
+        tarefa: "Praticar 20 min/dia alternando voicings densos e leves por secao.",
+      },
+      Avancado: {
+        aquecimento: "Precisao harmonica com extensoes, tensoes e controle dinamico.",
+        revisao: "Revisar conducoes avancadas com minimo deslocamento entre vozes.",
+        novo: "Construir arranjo de teclado com densidade progressiva e resposta de banda.",
+        tarefa: "Praticar 30 min/dia com gravacao completa e revisao de equilíbrio no mix.",
+      },
+    },
+    voz: {
+      Iniciante: {
+        aquecimento: "Respiracao diafragmatica + vocalizes leves em tessitura confortavel.",
+        revisao: "Revisar afinacao de frases curtas e diccao em andamento lento.",
+        novo: "Introducao a apoio respiratorio, ataque suave e finalizacao limpa de frases.",
+        tarefa: "Praticar 15 min/dia: respiracao 4-4-8 + melodia principal com referencia tonal.",
+      },
+      Intermediario: {
+        aquecimento: "Apoio respiratorio + vocalizes com salto de terca e quinta.",
+        revisao: "Revisar estabilidade de afinacao e controle de dinamica por secao.",
+        novo: "Trabalhar harmonizacao vocal simples e intencao interpretativa do texto.",
+        tarefa: "Praticar 20 min/dia com gravacao: verso suave e refrao com projecao controlada.",
+      },
+      Avancado: {
+        aquecimento: "Rotina tecnica completa: respiracao, ressonancia, extensao e controle de timbre.",
+        revisao: "Revisar transicoes de registro, microafinacao e consistencia em passagens longas.",
+        novo: "Aplicar recursos avancados de expressao, blend vocal e lideranca de entrada.",
+        tarefa: "Praticar 30 min/dia com clique e guia: performance completa com dinamica intencional.",
+      },
+    },
+  },
+  instrumentSongSuggestionsByLevel: {
+    violao: {
+      Iniciante: [
+        "Bondade de Deus - Dica violao iniciante: batida simples e troca limpa entre G-D-Em-C.",
+        "A Casa e Sua - Dica violao iniciante: manter pulso firme no verso.",
+      ],
+      Intermediario: [
+        "Yeshua - Dica violao intermediaria: variar dinamica por secao sem perder tempo.",
+        "Ninguem Explica Deus - Dica violao intermediaria: alternar batida e dedilhado de apoio.",
+      ],
+      Avancado: [
+        "Bondade de Deus - Dica violao avancada: construir textura com voicings e muting controlado.",
+        "A Casa e Sua - Dica violao avancada: criar arranjo progressivo com resposta de banda.",
+      ],
+    },
+    "contrabaixo eletrico": {
+      Iniciante: [
+        "Bondade de Deus - Dica baixo iniciante: tônica e quinta com ataque consistente.",
+        "A Casa e Sua - Dica baixo iniciante: entradas limpas no inicio de cada secao.",
+      ],
+      Intermediario: [
+        "Yeshua - Dica baixo intermediaria: groove estavel com pequenas notas de passagem.",
+        "Ninguem Explica Deus - Dica baixo intermediaria: controlar dinâmica sem perder pulso.",
+      ],
+      Avancado: [
+        "Bondade de Deus - Dica baixo avancada: linha com variacao ritmica e sustentacao da harmonia.",
+        "A Casa e Sua - Dica baixo avancada: resposta de fraseado sem competir com a voz.",
+      ],
+    },
+    guitarra: {
+      Iniciante: [
+        "Quao Grande e o Meu Deus - Dica guitarra iniciante: riffs curtos entre frases vocais.",
+        "Bondade de Deus - Dica guitarra iniciante: base limpa com ataque controlado.",
+      ],
+      Intermediario: [
+        "Yeshua - Dica guitarra intermediaria: delays curtos e fraseado de apoio por secao.",
+        "A Casa e Sua - Dica guitarra intermediaria: alternar ambiencia e base sem embolar.",
+      ],
+      Avancado: [
+        "Ninguem Explica Deus - Dica guitarra avancada: camadas com dinamica e timbre intencional.",
+        "Bondade de Deus - Dica guitarra avancada: conduzir crescendo com controle de ruido.",
+      ],
+    },
+    teclado: {
+      Iniciante: [
+        "Quao Grande e o Meu Deus - Dica teclado iniciante: voicings simples e transicoes suaves.",
+        "Bondade de Deus - Dica teclado iniciante: equilibrio entre mao esquerda e direita.",
+      ],
+      Intermediario: [
+        "Yeshua - Dica teclado intermediario: conduzir vozes com minimo deslocamento.",
+        "A Casa e Sua - Dica teclado intermediario: alternar piano/pad por secao.",
+      ],
+      Avancado: [
+        "Ninguem Explica Deus - Dica teclado avancado: extensoes harmonicas com controle dinamico.",
+        "Bondade de Deus - Dica teclado avancado: arranjo em camadas sem cobrir a voz.",
+      ],
+    },
+  },
   exercisesByInstrument: {
     violão: [
       "Exercício 1: troca C -> G -> D em semínimas por 5 minutos.",
@@ -466,3 +683,5 @@ window.lessonPlannerData = Object.freeze({
     },
   },
 });
+
+

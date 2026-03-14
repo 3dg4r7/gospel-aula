@@ -140,6 +140,57 @@ G D Em C
           <p id="statusMessage" class="status" aria-live="polite"></p>
         </section>
       </div>
+
+      <section class="card config-card">
+        <h2>Editor de configuracoes (admin)</h2>
+        <p class="subtitle small">
+          Ajuste conteudo, materiais, foco e repertorio por instrumento sem editar
+          arquivos do projeto. As alteracoes ficam salvas no navegador atual.
+        </p>
+        <div class="config-presets">
+          <label for="configPresetInstrument">Preset rapido por instrumento</label>
+          <div class="config-row">
+            <select id="configPresetInstrument">
+              <option value="violao">violao</option>
+              <option value="contrabaixo eletrico">contrabaixo eletrico</option>
+              <option value="guitarra">guitarra</option>
+              <option value="teclado">teclado</option>
+              <option value="voz">voz</option>
+            </select>
+            <button id="configApplyPreset" type="button" class="btn-ghost">
+              Inserir preset no editor
+            </button>
+          </div>
+        </div>
+        <textarea
+          id="configEditor"
+          rows="14"
+          spellcheck="false"
+          placeholder='{"instrumentLessonContentByLevel": {}}'
+        ></textarea>
+        <div class="config-actions">
+          <button id="configReload" type="button" class="btn-ghost">Recarregar editor</button>
+          <button id="configReset" type="button" class="btn-ghost">Restaurar padrao</button>
+          <button id="configSave" type="button" class="btn-primary">Salvar e aplicar</button>
+        </div>
+        <div class="config-packages">
+          <h3>Pacotes de configuracao versionados</h3>
+          <p class="subtitle small">
+            Salve snapshots do editor como v1, v2, v3... para alternar rapidamente entre curriculos.
+          </p>
+          <div class="config-row">
+            <input id="configPackageName" type="text" placeholder="Nome do pacote (ex.: Voz Culto Noite)" />
+            <button id="configPackageSave" type="button" class="btn-ghost">Salvar nova versao</button>
+          </div>
+          <div class="config-row">
+            <select id="configPackageList">
+              <option value="">Nenhum pacote salvo</option>
+            </select>
+            <button id="configPackageApply" type="button" class="btn-ghost">Aplicar pacote</button>
+            <button id="configPackageDelete" type="button" class="btn-ghost">Excluir pacote</button>
+          </div>
+        </div>
+      </section>
     </main>
 
     <script src="./lesson-data.js"></script>
