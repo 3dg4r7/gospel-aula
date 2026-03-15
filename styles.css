@@ -444,6 +444,12 @@ pre {
   background: rgba(8, 21, 30, 0.9);
 }
 
+.quick-preset-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+}
+
 .config-card {
   margin-top: 16px;
   animation-delay: 180ms;
@@ -496,6 +502,10 @@ pre {
 }
 
 @media (max-width: 900px) {
+  .quick-preset-row {
+    grid-template-columns: 1fr;
+  }
+
   .config-row,
   .config-row + .config-row {
     grid-template-columns: 1fr;

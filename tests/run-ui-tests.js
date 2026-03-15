@@ -111,6 +111,8 @@ function createRuntime() {
     "level",
     "objective",
     "instrument",
+    "quickPreset",
+    "applyQuickPreset",
     "duration",
     "currentBpm",
     "studentGoal",
@@ -139,6 +141,7 @@ function createRuntime() {
               "profile",
               "level",
               "instrument",
+              "quickPreset",
               "duration",
               "configPresetInstrument",
               "configPackageList",
@@ -147,6 +150,7 @@ function createRuntime() {
           : id.includes("Btn") ||
               id === "copyPlan" ||
               id === "analyzeChordSheet" ||
+              id === "applyQuickPreset" ||
               id === "configSave" ||
               id === "configReset" ||
               id === "configReload" ||
@@ -282,6 +286,26 @@ test("analisar com campo vazio mostra erro e esconde resumo", () => {
   assert.equal(summaryText.textContent, "");
   assert.equal(badge.hidden, true);
   assert.ok(status.textContent.includes("Cole uma cifra valida para analisar."));
+});
+
+test("preset rapido no formulario aplica conteudo sem editor json", () => {
+  const quickPreset = document.getElementById("quickPreset");
+  const applyQuickPreset = document.getElementById("applyQuickPreset");
+  const status = document.getElementById("statusMessage");
+  const output = document.getElementById("output");
+  const objective = document.getElementById("objective");
+  const instrument = document.getElementById("instrument");
+  const level = document.getElementById("level");
+
+  objective.value = "Teste preset simples";
+  instrument.value = "violao";
+  level.value = "Avancado";
+  quickPreset.value = "guitarra";
+  applyQuickPreset.dispatchEvent("click");
+
+  assert.ok(status.textContent.includes("Preset aplicado"));
+  assert.equal(instrument.value, "guitarra");
+  assert.ok(output.textContent.includes("camadas com dinamica e timbre"));
 });
 
 test("editor de configuracoes valida JSON, schema e aplica override local", () => {

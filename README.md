@@ -55,11 +55,9 @@ node tests/run-state-tests.js
 - Cópia do plano para área de transferência.
 - Salvamento automático do formulário no `localStorage`.
 - Migração automática de dados antigos sem acentuação.
-- Editor admin no app para editar configuracoes por instrumento e aplicar localmente.
-- Preset rapido por instrumento (violao, contrabaixo, guitarra, teclado e voz) para preencher o editor com base pronta.
-- Validacao de schema no salvar para evitar tipos incorretos no JSON do editor.
-- Pacotes de configuracao versionados no navegador (`v1`, `v2`, `v3`...) para alternar curriculos com um clique.
-- Exportacao e importacao de pacotes em arquivo `.json` para backup e compartilhamento.
+- Preset rapido direto no formulario da aula, sem necessidade de editar JSON.
+- Aplicacao com um clique: escolher preset e clicar em `Aplicar`.
+- Opcao `Sem preset extra` para voltar ao conteudo padrao.
 
 ## Exemplos de cifra para colar
 
@@ -175,13 +173,10 @@ Tu es, Senhor
 - Focos extras de exercicio por instrumento: `instrumentExtraExerciseFocusByType`.
 - Repertorio por instrumento e nivel: `instrumentSongSuggestionsByLevel`.
 
-## Fluxo recomendado do editor admin
+## Fluxo recomendado de preset simples
 
-1. Escolha o instrumento em `Preset rapido por instrumento`.
-2. Clique em `Inserir preset no editor`.
-3. Ajuste o JSON conforme sua metodologia.
-4. Clique em `Salvar e aplicar` para testar no plano gerado.
-5. Informe um nome de pacote e clique em `Salvar nova versao` para guardar historico.
-6. Use `Aplicar pacote` para trocar rapido de curriculo (ex.: `Voz culto noite v2`).
-7. Use `Exportar pacote (.json)` para backup e `Importar pacote (.json)` para restaurar em outro navegador/dispositivo.
+1. Escolha o instrumento da aula.
+2. Em `Preset rapido`, selecione `Recomendado para instrumento` ou um preset especifico.
+3. Clique em `Aplicar` para carregar conteudo, materiais, foco e repertorio.
+4. Se quiser voltar ao padrao, selecione `Sem preset extra` e clique em `Aplicar`.
 

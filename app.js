@@ -310,6 +310,8 @@ const analyzeChordSheetBtn = document.getElementById("analyzeChordSheet");
 const chordAnalysis = document.getElementById("chordAnalysis");
 const chordAnalysisOutput = document.getElementById("chordAnalysisOutput");
 const chordConfidenceBadge = document.getElementById("chordConfidenceBadge");
+const quickPresetSelect = document.getElementById("quickPreset");
+const applyQuickPresetBtn = document.getElementById("applyQuickPreset");
 
 const configEditor = document.getElementById("configEditor");
 const configSaveBtn = document.getElementById("configSave");
@@ -335,6 +337,7 @@ const formFieldElements = {
   currentBpm: document.getElementById("currentBpm"),
   studentGoal: document.getElementById("studentGoal"),
   chordSheet: document.getElementById("chordSheetInput"),
+  quickPreset: quickPresetSelect,
 };
 
 function isPlainObject(value) {
@@ -847,9 +850,7 @@ async function readJsonFileFromInput(file) {
   });
 }
 
-function populatePresetInstrumentOptions() {
-  if (!configPresetInstrument) return;
-
+function buildInstrumentOptionList() {
   const fromPlanner = Object.keys(exercisesByInstrument || {});
   const fromPreset = Object.keys(INSTRUMENT_PRESETS);
   const deduped = [];
@@ -862,6 +863,52 @@ function populatePresetInstrumentOptions() {
   });
 
   if (deduped.length === 0) deduped.push("voz");
+  return deduped;
+}
+
+function populateQuickPresetOptions() {
+  if (!quickPresetSelect) return;
+
+  const instrumentOptions = buildInstrumentOptionList();
+  const previousValue = quickPresetSelect.value || formState.get("quickPreset") || "instrument-default";
+
+  quickPresetSelect.innerHTML = "";
+
+  const fixedOptions = [
+    {
+      value: "instrument-default",
+      label: "Recomendado para instrumento",
+    },
+    {
+      value: "none",
+      label: "Sem preset extra",
+    },
+  ];
+
+  fixedOptions.forEach((item) => {
+    const option = document.createElement("option");
+    option.value = item.value;
+    option.textContent = item.label;
+    quickPresetSelect.appendChild(option);
+  });
+
+  instrumentOptions.forEach((instrumentName) => {
+    const option = document.createElement("option");
+    option.value = instrumentName;
+    option.textContent = `Preset: ${instrumentName}`;
+    quickPresetSelect.appendChild(option);
+  });
+
+  const selectableValues = ["instrument-default", "none", ...instrumentOptions];
+  const resolved = resolveOption(previousValue, selectableValues, "instrument-default");
+  quickPresetSelect.value = resolved;
+  formState.setField("quickPreset", resolved, { syncDom: false });
+}
+
+function populatePresetInstrumentOptions() {
+  if (!configPresetInstrument) return;
+
+  const deduped = buildInstrumentOptionList();
 
   const previousValue = configPresetInstrument.value || formState.get("instrument");
   configPresetInstrument.innerHTML = "";
@@ -926,6 +973,61 @@ function buildPresetOverridesForInstrument(instrumentName) {
   }
 
   return overrides;
+}
+
+function resolveQuickPresetInstrument(presetValue, formData) {
+  if (presetValue === "none") return "";
+  if (presetValue === "instrument-default") {
+    return formData.instrument || formState.get("instrument") || "";
+  }
+  return presetValue;
+}
+
+function applySimplePresetSelection() {
+  if (!quickPresetSelect) return;
+
+  formState.readFromDom();
+  const data = formState.snapshot();
+  const presetValue = data.quickPreset || "instrument-default";
+
+  if (presetValue === "none") {
+    const ok = clearPlannerOverrides();
+    if (!ok) {
+      showStatus("Nao foi possivel remover o preset ativo.");
+      return;
+    }
+    refreshPlannerAndRenderCurrentState();
+    saveFormData(formState.snapshot());
+    showStatus("Preset removido. Conteudo restaurado para o padrao.");
+    return;
+  }
+
+  const targetInstrument = resolveQuickPresetInstrument(presetValue, data);
+  const presetOverrides = buildPresetOverridesForInstrument(targetInstrument);
+  if (!presetOverrides) {
+    showStatus("Nenhum preset encontrado para o instrumento selecionado.");
+    return;
+  }
+
+  const ok = savePlannerOverrides(presetOverrides);
+  if (!ok) {
+    showStatus("Nao foi possivel aplicar o preset selecionado.");
+    return;
+  }
+
+  if (presetValue !== "instrument-default") {
+    const availableInstrumentOptions = Object.keys(exercisesByInstrument || {});
+    const resolvedInstrument = resolveOption(
+      targetInstrument,
+      availableInstrumentOptions,
+      formState.get("instrument")
+    );
+    formState.setField("instrument", resolvedInstrument);
+  }
+
+  refreshPlannerAndRenderCurrentState();
+  saveFormData(formState.snapshot());
+  showStatus(`Preset aplicado para "${targetInstrument}".`);
 }
 
 function normalizeStateValue(key, value) {
@@ -1439,8 +1541,12 @@ function resetFormState() {
     Object.keys(exercisesByInstrument),
     Object.keys(exercisesByInstrument)[0] || "violao"
   );
+  populateQuickPresetOptions();
   populatePresetInstrumentOptions();
   formState.readFromDom();
+  if (quickPresetSelect) {
+    formState.setField("quickPreset", quickPresetSelect.value || "instrument-default");
+  }
   output.textContent = DEFAULT_OUTPUT;
   renderChordAnalysis(null);
   updateTempoIndicator(null);
@@ -1460,12 +1566,14 @@ function init() {
     Object.keys(exercisesByInstrument),
     Object.keys(exercisesByInstrument)[0] || "violao"
   );
+  populateQuickPresetOptions();
   populatePresetInstrumentOptions();
   populatePackageList();
 
   const saved = loadFormData();
   if (saved) {
     fillForm(saved);
+    populateQuickPresetOptions();
     const data = formState.snapshot();
     if (data.objective || data.chordSheet) {
       output.textContent = buildLessonPlan(data);
@@ -1537,6 +1645,10 @@ function init() {
       saveFormData(formState.snapshot());
       showStatus("Cifra analisada. Gere a aula para aplicar essa analise no plano.");
     });
+  }
+
+  if (applyQuickPresetBtn) {
+    applyQuickPresetBtn.addEventListener("click", applySimplePresetSelection);
   }
 
   if (configSaveBtn) configSaveBtn.addEventListener("click", handleConfigSave);
