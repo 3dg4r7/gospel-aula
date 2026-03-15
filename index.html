@@ -189,6 +189,20 @@ G D Em C
             <button id="configPackageApply" type="button" class="btn-ghost">Aplicar pacote</button>
             <button id="configPackageDelete" type="button" class="btn-ghost">Excluir pacote</button>
           </div>
+          <div class="config-row config-row-actions">
+            <button id="configPackageExport" type="button" class="btn-ghost">
+              Exportar pacote (.json)
+            </button>
+            <button id="configPackageImport" type="button" class="btn-ghost">
+              Importar pacote (.json)
+            </button>
+            <input
+              id="configPackageImportFile"
+              type="file"
+              accept=".json,application/json"
+              hidden
+            />
+          </div>
         </div>
       </section>
     </main>

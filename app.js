@@ -322,6 +322,9 @@ const configPackageSaveBtn = document.getElementById("configPackageSave");
 const configPackageList = document.getElementById("configPackageList");
 const configPackageApplyBtn = document.getElementById("configPackageApply");
 const configPackageDeleteBtn = document.getElementById("configPackageDelete");
+const configPackageExportBtn = document.getElementById("configPackageExport");
+const configPackageImportBtn = document.getElementById("configPackageImport");
+const configPackageImportFile = document.getElementById("configPackageImportFile");
 
 const formFieldElements = {
   profile: document.getElementById("profile"),
@@ -699,6 +702,149 @@ function populatePackageList(selectedPackageId) {
   const availableIds = packages.map((pkg) => pkg.id);
   const resolvedId = resolveOption(previousValue, availableIds, availableIds[0]);
   configPackageList.value = resolvedId;
+}
+
+function sanitizeFileNamePart(value) {
+  const safe = normalizeOptionValue(value)
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
+  return safe || "pacote";
+}
+
+function buildPackageExportPayload(pkg) {
+  return {
+    format: "gospel-planner-package-v1",
+    exportedAt: new Date().toISOString(),
+    package: {
+      name: pkg.name,
+      version: pkg.version,
+      createdAt: pkg.createdAt,
+      overrides: deepClone(pkg.overrides),
+    },
+  };
+}
+
+function triggerJsonDownload(fileName, payload) {
+  if (
+    typeof Blob === "undefined" ||
+    !window.URL ||
+    typeof window.URL.createObjectURL !== "function" ||
+    typeof window.URL.revokeObjectURL !== "function"
+  ) {
+    return false;
+  }
+
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], { type: "application/json;charset=utf-8" });
+  const objectUrl = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = fileName;
+
+  if (typeof link.click === "function") {
+    link.click();
+  } else if (document.body && typeof document.body.appendChild === "function") {
+    document.body.appendChild(link);
+    link.click();
+    if (typeof document.body.removeChild === "function") {
+      document.body.removeChild(link);
+    }
+  } else {
+    window.URL.revokeObjectURL(objectUrl);
+    return false;
+  }
+
+  window.URL.revokeObjectURL(objectUrl);
+  return true;
+}
+
+function normalizeImportedPackageEntries(parsedJson) {
+  if (Array.isArray(parsedJson)) return parsedJson;
+  if (isPlainObject(parsedJson) && Array.isArray(parsedJson.packages)) return parsedJson.packages;
+  if (isPlainObject(parsedJson) && isPlainObject(parsedJson.package)) return [parsedJson.package];
+  if (
+    isPlainObject(parsedJson) &&
+    typeof parsedJson.name === "string" &&
+    Object.prototype.hasOwnProperty.call(parsedJson, "overrides")
+  ) {
+    return [parsedJson];
+  }
+  return [];
+}
+
+function importPackagesFromEntries(rawEntries) {
+  const existing = loadPlannerPackages();
+  const working = [...existing];
+  const importedIds = [];
+  let skippedCount = 0;
+
+  (rawEntries || []).forEach((entry) => {
+    if (!isPlainObject(entry)) {
+      skippedCount += 1;
+      return;
+    }
+
+    const name = typeof entry.name === "string" ? entry.name.trim() : "";
+    const overrides = normalizeConfigOverrides(entry.overrides);
+    if (!name || Object.keys(overrides).length === 0) {
+      skippedCount += 1;
+      return;
+    }
+
+    const schemaErrors = validateConfigOverridesSchema(overrides);
+    if (schemaErrors.length > 0) {
+      skippedCount += 1;
+      return;
+    }
+
+    const sameName = working.filter(
+      (item) => normalizeOptionValue(item.name) === normalizeOptionValue(name)
+    );
+    const highestVersion = sameName.reduce(
+      (maxVersion, item) => Math.max(maxVersion, item.version),
+      0
+    );
+
+    const nextVersion = highestVersion + 1;
+    const importedPackage = {
+      id: createPackageId(name, nextVersion),
+      name,
+      version: nextVersion,
+      createdAt:
+        typeof entry.createdAt === "string" && entry.createdAt
+          ? entry.createdAt
+          : new Date().toISOString(),
+      overrides,
+    };
+
+    working.unshift(importedPackage);
+    importedIds.push(importedPackage.id);
+  });
+
+  return {
+    packages: working,
+    importedIds,
+    skippedCount,
+  };
+}
+
+async function readJsonFileFromInput(file) {
+  if (!file) throw new Error("Arquivo nao informado.");
+
+  if (typeof file.text === "function") {
+    return file.text();
+  }
+
+  if (typeof FileReader === "undefined") {
+    throw new Error("Leitura de arquivo nao suportada neste navegador.");
+  }
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(new Error("Falha ao ler o arquivo selecionado."));
+    reader.readAsText(file, "utf-8");
+  });
 }
 
 function populatePresetInstrumentOptions() {
@@ -1186,6 +1332,88 @@ function handleConfigPackageDelete() {
   showStatus(`Pacote "${pkg.name}" v${pkg.version} excluido.`);
 }
 
+function handleConfigPackageExport() {
+  const selectedPackageId = getSelectedPackageId();
+  if (!selectedPackageId) {
+    showStatus("Selecione um pacote valido para exportar.");
+    return;
+  }
+
+  const packages = loadPlannerPackages();
+  const pkg = findPackageById(packages, selectedPackageId);
+  if (!pkg) {
+    showStatus("Pacote nao encontrado para exportacao.");
+    populatePackageList();
+    return;
+  }
+
+  const fileName = `${sanitizeFileNamePart(pkg.name)}-v${pkg.version}.json`;
+  const payload = buildPackageExportPayload(pkg);
+  const ok = triggerJsonDownload(fileName, payload);
+  if (!ok) {
+    showStatus("Exportacao nao suportada neste ambiente.");
+    return;
+  }
+
+  showStatus(`Pacote "${pkg.name}" v${pkg.version} exportado em .json.`);
+}
+
+function handleConfigPackageImportClick() {
+  if (!configPackageImportFile) {
+    showStatus("Importacao nao disponivel nesta tela.");
+    return;
+  }
+
+  configPackageImportFile.value = "";
+  if (typeof configPackageImportFile.click === "function") {
+    configPackageImportFile.click();
+    return;
+  }
+  showStatus("Nao foi possivel abrir seletor de arquivo neste navegador.");
+}
+
+async function handleConfigPackageImportFileChange(event) {
+  const fileInput = event?.target || configPackageImportFile;
+  const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+  if (!file) {
+    showStatus("Selecione um arquivo .json para importar.");
+    return;
+  }
+
+  try {
+    const rawText = await readJsonFileFromInput(file);
+    const parsed = JSON.parse(rawText || "{}");
+    const entries = normalizeImportedPackageEntries(parsed);
+    if (entries.length === 0) {
+      showStatus("Arquivo invalido. Use um pacote .json exportado pelo app.");
+      return;
+    }
+
+    const imported = importPackagesFromEntries(entries);
+    if (imported.importedIds.length === 0) {
+      showStatus("Nenhum pacote valido foi importado.");
+      return;
+    }
+
+    const ok = savePlannerPackages(imported.packages);
+    if (!ok) {
+      showStatus("Nao foi possivel salvar os pacotes importados.");
+      return;
+    }
+
+    const selectedId = imported.importedIds[0];
+    populatePackageList(selectedId);
+    const importedCount = imported.importedIds.length;
+    const skippedInfo =
+      imported.skippedCount > 0 ? ` ${imported.skippedCount} item(ns) ignorado(s).` : "";
+    showStatus(`Importacao concluida: ${importedCount} pacote(s) adicionado(s).${skippedInfo}`);
+  } catch {
+    showStatus("Falha ao importar arquivo .json.");
+  } finally {
+    if (configPackageImportFile) configPackageImportFile.value = "";
+  }
+}
+
 function handleConfigReset() {
   const ok = clearPlannerOverrides();
   if (!ok) {
@@ -1319,6 +1547,15 @@ function init() {
   if (configPackageApplyBtn) configPackageApplyBtn.addEventListener("click", handleConfigPackageApply);
   if (configPackageDeleteBtn) {
     configPackageDeleteBtn.addEventListener("click", handleConfigPackageDelete);
+  }
+  if (configPackageExportBtn) {
+    configPackageExportBtn.addEventListener("click", handleConfigPackageExport);
+  }
+  if (configPackageImportBtn) {
+    configPackageImportBtn.addEventListener("click", handleConfigPackageImportClick);
+  }
+  if (configPackageImportFile) {
+    configPackageImportFile.addEventListener("change", handleConfigPackageImportFileChange);
   }
 }
 

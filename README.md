@@ -59,6 +59,7 @@ node tests/run-state-tests.js
 - Preset rapido por instrumento (violao, contrabaixo, guitarra, teclado e voz) para preencher o editor com base pronta.
 - Validacao de schema no salvar para evitar tipos incorretos no JSON do editor.
 - Pacotes de configuracao versionados no navegador (`v1`, `v2`, `v3`...) para alternar curriculos com um clique.
+- Exportacao e importacao de pacotes em arquivo `.json` para backup e compartilhamento.
 
 ## Exemplos de cifra para colar
 
@@ -182,4 +183,5 @@ Tu es, Senhor
 4. Clique em `Salvar e aplicar` para testar no plano gerado.
 5. Informe um nome de pacote e clique em `Salvar nova versao` para guardar historico.
 6. Use `Aplicar pacote` para trocar rapido de curriculo (ex.: `Voz culto noite v2`).
+7. Use `Exportar pacote (.json)` para backup e `Importar pacote (.json)` para restaurar em outro navegador/dispositivo.
 

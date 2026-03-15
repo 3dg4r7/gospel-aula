@@ -484,6 +484,10 @@ pre {
   grid-template-columns: 1.3fr repeat(2, minmax(0, 1fr));
 }
 
+.config-row-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .config-actions {
   margin-top: 10px;
   display: grid;

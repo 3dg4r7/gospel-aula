@@ -126,6 +126,9 @@ function createRuntime() {
     "configPackageList",
     "configPackageApply",
     "configPackageDelete",
+    "configPackageExport",
+    "configPackageImport",
+    "configPackageImportFile",
   ];
 
   elementIds.forEach((id) => {
@@ -150,11 +153,15 @@ function createRuntime() {
               id === "configApplyPreset" ||
               id === "configPackageSave" ||
               id === "configPackageApply" ||
-              id === "configPackageDelete"
+              id === "configPackageDelete" ||
+              id === "configPackageExport" ||
+              id === "configPackageImport"
             ? "button"
             : ["studentGoal", "chordSheetInput", "configEditor"].includes(id)
               ? "textarea"
-              : ["objective", "currentBpm", "configPackageName"].includes(id)
+              : ["objective", "currentBpm", "configPackageName", "configPackageImportFile"].includes(
+                    id
+                  )
                 ? "input"
                 : "div";
     document.register(new MockElement(tagName, id));
@@ -371,6 +378,37 @@ test("pacotes versionados salvam versoes e aplicam configuracao", () => {
 
   assert.ok(status.textContent.includes("aplicado"));
   assert.ok(output.textContent.includes("Pacote Voz v2"));
+});
+
+
+test("acoes de exportar/importar pacote exibem feedback", () => {
+  const editor = document.getElementById("configEditor");
+  const packageName = document.getElementById("configPackageName");
+  const packageSave = document.getElementById("configPackageSave");
+  const packageExport = document.getElementById("configPackageExport");
+  const packageImport = document.getElementById("configPackageImport");
+  const status = document.getElementById("statusMessage");
+
+  packageName.value = "Pacote Export";
+  editor.value = JSON.stringify({
+    voiceSongSuggestionsByLevel: {
+      Iniciante: ["Pacote export teste"],
+    },
+  });
+  packageSave.dispatchEvent("click");
+
+  packageExport.dispatchEvent("click");
+  assert.ok(
+    status.textContent.includes("Exportacao") ||
+      status.textContent.includes("exportado") ||
+      status.textContent.includes("Selecione um pacote")
+  );
+
+  packageImport.dispatchEvent("click");
+  assert.ok(
+    status.textContent.includes("seletor de arquivo") ||
+      status.textContent.includes("Importacao nao disponivel")
+  );
 });
 
 const failures = results.filter((item) => item.status === "fail");
